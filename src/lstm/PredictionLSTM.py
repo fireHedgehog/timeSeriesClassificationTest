@@ -83,7 +83,7 @@ def forecast_lstm(model, batch_size, X):
 # load dataset
 # read data from csv_file
 series = read_csv('../../static/data_set_labeled.csv',
-                  nrows=2000,
+                  nrows=200,
                   header=0,
                   parse_dates=[0],
                   index_col=0,
@@ -91,8 +91,7 @@ series = read_csv('../../static/data_set_labeled.csv',
 # transform data to be stationary
 raw_values = series.values
 
-data_length_for_train = int(len(raw_values) * 0.66)
-data_length_for_test = len(raw_values) - data_length_for_train
+data_inverse_length = - (len(raw_values) - 2)
 
 diff_values = difference(raw_values, 1)
 
@@ -101,12 +100,11 @@ supervised = timeseries_to_supervised(diff_values, 1)
 supervised_values = supervised.values
 
 # split data into train and test-sets
-train = supervised_values[0:-data_length_for_train]
-test = supervised_values[-data_length_for_test:]
+train, test = supervised_values[0:data_inverse_length], supervised_values[data_inverse_length:]
 
 # transform the scale of the data
 # fit the model
-lstm_model = fit_lstm(train, 1, 1000, 5)
+lstm_model = fit_lstm(train, 1, 1000, 3)
 # forecast the entire training dataset to build up state for forecasting
 train_reshaped = train[:, 0].reshape(len(train), 1, 1)
 lstm_model.predict(train_reshaped, batch_size=1)
@@ -125,10 +123,10 @@ for i in range(len(test)):
     print('T=%d, Predicted=%f, Expected=%f' % (i + 1, yhat, expected))
 
 # report performance
-rmse = sqrt(mean_squared_error(raw_values[-data_length_for_test:], predictions))
+rmse = sqrt(mean_squared_error(raw_values[data_inverse_length:], predictions))
 print('Test RMSE: %.3f' % rmse)
 # line plot of observed vs predicted
-pyplot.plot(raw_values[-data_length_for_train:])
+pyplot.plot(raw_values[data_inverse_length:])
 pyplot.plot(predictions)
 
 # title of the graph
