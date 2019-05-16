@@ -69,7 +69,7 @@ scores = cross_val_score(clf, X_features, y_true, scoring='accuracy')
 clf.fit(X_features, y_true)
 
 print("Cross validation")
-print("Accuracy: {0:.1f}%".format(np.mean(scores) * 100))  # Accuracy: 73.2%
+print("Accuracy: {0:.1f}%".format(np.mean(scores) * 100))  # Accuracy: 73.2%git
 
 y_importances = clf.feature_importances_
 x_importances = tested_feature
