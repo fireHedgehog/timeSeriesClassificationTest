@@ -1,40 +1,44 @@
-from pandas import read_csv
-from sklearn.model_selection import cross_val_score
 from sklearn.tree import DecisionTreeClassifier
 import numpy as np
-from sklearn.metrics import confusion_matrix
-import seaborn as sns
+from sklearn.model_selection import train_test_split
+from pandas import read_csv
+from sklearn.metrics import classification_report, confusion_matrix
 import matplotlib.pyplot as plt
+import seaborn as sns
 
-# read_featured_data
-series_data = read_csv('../../static/featured_data.csv', parse_dates=["date"])
+data = read_csv('../../static/featured_data_v3.csv', parse_dates=["date"], skiprows=range(1, 2))
 
-tested_feature = ["week_day", "hour", "difference", "frequency"]
+tested_feature = ["trend", "difference", "previous", "second", "alarm", "week_day"]
+x = data[tested_feature].values
+y = data['fluctuation_type'].values
 
-y_true = series_data['fluctuation_type'].values
-X_features = series_data[tested_feature].values
+y = np.delete(y, 0, axis=0)  # move 1 T ahead
+x = np.delete(x, (len(x) - 1), axis=0)  # make data size consistent
 
-y_true = np.delete(y_true, 0, axis=0)  # move 1 T ahead
-y_true = np.delete(y_true, 0, axis=0)  # move 1 T ahead
-
-X_features = np.delete(X_features, (len(X_features) - 1), axis=0)  # make data size consistent
-X_features = np.delete(X_features, (len(X_features) - 1), axis=0)  # make data size consistent
-
-print(y_true)
-print(X_features)
+x_train, x_test, y_train, y_test = train_test_split(x, y, random_state=1, train_size=0.9)
 
 clf = DecisionTreeClassifier(random_state=14)
-scores = cross_val_score(clf, X_features, y_true, scoring='accuracy')
+# clf = svm.SVC(C=0.8, kernel='rbf', decision_function_shape='ovr')
+clf.fit(x_train, y_train.ravel())
 
-clf.fit(X_features, y_true)
+scores_train = clf.score(x_train, y_train)
+y_pre_train = clf.predict(x_train)
 
-print("Cross validation")
-print("Accuracy: {0:.1f}%".format(np.mean(scores) * 100))  # Accuracy: 73.2%git
+scores_test = clf.score(x_test, y_test)
+y_pre_test = clf.predict(x_test)
 
-print(confusion_matrix(y_true, y_true))
+print("\nTrain Accuracy: {0:.1f}%".format(np.mean(scores_train) * 100))
+# print("\nTrain Predication: \n", y_pre_train)
 
-C2 = confusion_matrix(y_true, y_true)
-sns.heatmap(C2, annot=True)
+print("\nTest Accuracy: {0:.1f}%".format(np.mean(scores_test) * 100))
+# print("\ntest Predication: \n", y_pre_test)
+
+# print('decision_function:\n', clf.decision_function(x_train))
+matrix = confusion_matrix(y_test, y_pre_test, labels=['No', 'Lower', 'Upper'])
+print(matrix)
+print(classification_report(y_test, y_pre_test))
+
+sns.heatmap(matrix, annot=True)
 plt.show()
 
 # dot_data = tree.export_graphviz(clf, out_file=None,
