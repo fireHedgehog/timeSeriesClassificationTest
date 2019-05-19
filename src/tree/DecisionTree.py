@@ -5,15 +5,17 @@ from pandas import read_csv
 from sklearn.metrics import classification_report, confusion_matrix
 import matplotlib.pyplot as plt
 import seaborn as sns
+from sklearn import tree
+import pydotplus
 
-data = read_csv('../../static/featured_data_v3.csv', parse_dates=["date"], skiprows=range(1, 2))
+data = read_csv('../../static/featured_data_v4.csv', parse_dates=["date"], skiprows=range(1, 2))
 
-tested_feature = ["trend", "difference", "previous", "second", "alarm", "week_day"]
+tested_feature = ["difference", "previous", "second", "threshold_alarm", "week_day"]
 x = data[tested_feature].values
 y = data['fluctuation_type'].values
 
-y = np.delete(y, 0, axis=0)  # move 1 T ahead
-x = np.delete(x, (len(x) - 1), axis=0)  # make data size consistent
+# y = np.delete(y, 0, axis=0)  # move 1 T ahead
+# x = np.delete(x, (len(x) - 1), axis=0)  # make data size consistent
 
 x_train, x_test, y_train, y_test = train_test_split(x, y, random_state=1, train_size=0.9)
 
@@ -41,16 +43,19 @@ print(classification_report(y_test, y_pre_test))
 sns.heatmap(matrix, annot=True)
 plt.show()
 
-# dot_data = tree.export_graphviz(clf, out_file=None,
+# dot_data = tree.export_graphviz(clf,
+#                                 out_file=None,
 #                                 feature_names=tested_feature,
-#                                 class_names=y_true,
-#                                 filled=True, rounded=True,
-#                                 special_characters=True)
+#                                 class_names=y_train.ravel(),
+#                                 filled=True,
+#                                 rounded=True,
+#                                 special_characters=True
+#                                 )
 #
 # graph = pydotplus.graph_from_dot_data(dot_data)
 # graph.write_pdf("iris.pdf")
 
-# # 画图
+# 画图
 # x_min, x_max = X_features[:, 0].min() - 1, X_features[:, 0].max() + 1
 # y_min, y_max = y_true[:, 1].min() - 1, y_true[:, 1].max() + 1
 # xx, yy = np.meshgrid(np.arange(x_min, x_max, 0.1),

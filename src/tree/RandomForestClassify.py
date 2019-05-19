@@ -6,14 +6,14 @@ from sklearn.metrics import classification_report, confusion_matrix
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-data = read_csv('../../static/featured_data_v3.csv', parse_dates=["date"], skiprows=range(1, 2))
+data = read_csv('../../static/featured_data_v4.csv', parse_dates=["date"], skiprows=range(1, 2))
 
-tested_feature = ["trend", "difference", "previous", "second", "alarm", "week_day"]
+tested_feature = ["trend", "difference", "previous", "second", "threshold_alarm", "week_day"]
 x = data[tested_feature].values
 y = data['fluctuation_type'].values
 
-y = np.delete(y, 0, axis=0)  # move 1 T ahead
-x = np.delete(x, (len(x) - 1), axis=0)  # make data size consistent
+# y = np.delete(y, 0, axis=0)  # move 1 T ahead
+# x = np.delete(x, (len(x) - 1), axis=0)  # make data size consistent
 
 x_train, x_test, y_train, y_test = train_test_split(x, y, random_state=1, train_size=0.9)
 
