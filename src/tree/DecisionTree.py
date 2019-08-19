@@ -5,8 +5,8 @@ from pandas import read_csv
 from sklearn.metrics import classification_report, confusion_matrix
 import matplotlib.pyplot as plt
 import seaborn as sns
-from sklearn import tree
-import pydotplus
+# from sklearn import tree
+# import pydotplus
 
 data = read_csv('../../static/featured_data_v4.csv', parse_dates=["date"], skiprows=range(1, 2))
 
